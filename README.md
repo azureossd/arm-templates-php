@@ -1,10 +1,10 @@
 # ARM Templates for PHP Apps
 
-### Windows
+### Windows Lab 1
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazureossd%2Farm-templates-php%2Fmaster%2Fphplabs-win.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazureossd%2Farm-templates-php%2Fmaster%php-windows-1.json)
 
 
-### Linux
+### Linux Lab 1
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazureossd%2Farm-templates-php%2Fmaster%2Fphplabs-linux.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazureossd%2Farm-templates-php%2Fmaster%2Fphp-linux-1.json)
