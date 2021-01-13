@@ -5,7 +5,7 @@
         "hostingPlanName":"[replace(resourceGroup().name,'.','')]",
         "siteName": "[concat(toLower(variables('hostingPlanName')), uniqueString(resourceGroup().id))]",
         "sku":"S1",
-        "repoURL":"https://github.com/azureossd/azure-php-laravel-example.git",
+        "repoURL":"https://github.com/azureossd/php-windows-1.git",
         "branch":"master",
         "siteConfig": {
           "phpVersion": "7.3"
