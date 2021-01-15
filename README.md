@@ -11,3 +11,7 @@
 ## Linux Lab 2
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazureossd%2Farm-templates-php%2Fmaster%2Fphp-linux-2.json)
+
+## WordPress
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fazureossd%2Farm-templates-php%2Fmaster%2Fwordpress.json)

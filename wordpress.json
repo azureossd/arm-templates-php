@@ -1,0 +1,142 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "hostingPlanName":"[replace(resourceGroup().name,'.','')]",
+        "dbServerName":"[concat('mysqlsrv',  uniqueString(resourceGroup().id))]",
+        "dbName":"[concat('mysqldb',  uniqueString(resourceGroup().id))]",
+        "dbUser":"mysqldbuser",
+        "dbUserPass": "Micr0s0ft",
+        "siteName": "[concat(toLower(variables('hostingPlanName')), uniqueString(resourceGroup().id))]",
+        "sku":"S1",
+        "dockerUrl":"https://index.docker.io",
+        "dockerImage":"appsvcorg/wordpress-alpine-php:0.9.3",
+        "gitRepo":"https://github.com/azureappserviceoss/wordpress-azure",
+        "gitBranch":"linux-appservice"
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-06-01",
+            "name": "[variables('hostingPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "sku": {
+              "name": "[variables('sku')]"
+            },
+            "kind": "linux",
+            "properties": {
+              "reserved": true
+            }
+          },
+        {
+            "apiVersion": "2020-06-01",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('siteName')]",
+            "type": "Microsoft.Web/sites",
+            "properties": {
+                "siteConfig": {
+                    "linuxFxVersion": "[concat('DOCKER|', variables('dockerImage'))]",
+                    "appSettings": [
+                        {
+                            "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                            "value": "true"
+                        },
+                        {
+                            "name": "DATABASE_HOST",
+                            "value": "[concat(variables('dbServerName'), 'mysql.database.azure.com')]"
+                        },
+                        {
+                            "name": "DATABASE_NAME",
+                            "value": "[variables('dbName')]"
+                        },
+                        {
+                            "name": "DATABASE_PASSWORD",
+                            "value": "[variables('dbUserPass')]"
+                        },
+                        {
+                            "name": "DATABASE_USERNAME",
+                            "value": "[concat(variables('dbUser'),'@',variables('dbServerName'))]"
+                        },
+                        {
+                            "name": "DOCKER_REGISTRY_SERVER_URL",
+                            "value": "[variables('dockerUrl')]"
+                        },
+                        {
+                            "name": "GIT_BRANCH",
+                            "value": "[variables('gitBranch')]"
+                        },
+                        {
+                            "name": "GIT_REPO",
+                            "value": "[variables('gitRepo')]"
+                        }
+                    ],
+                    "connectionStrings": [
+                        {
+                            "name": "defaultConnection",
+                            "ConnectionString": "[concat('Database=', variables('dbName'), ';Data Source=', variables('dbServerName') ,'.mysql.database.azure.com;User Id=',variables('dbUser'),'@',variables('dbServerName') ,';Password=',variables('dbUserPass'))]",
+                            "type": "MySQL"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'), '/databases/' , variables('dbName'))]"
+            ]
+        },
+        {
+            "name": "[variables('dbServerName')]",
+            "type": "Microsoft.DBforMySQL/servers",
+            "apiVersion": "2017-12-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "version": "5.7",
+                "createMode": "Default",
+                "administratorLogin": "[variables('dbUser')]",
+                "administratorLoginPassword": "[variables('dbUserPass')]",
+                "sslEnforcement": "Disabled",
+                "storageProfile": {
+                    "storageMB": 5120,
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled"
+                }
+            },
+            "sku": {
+                "name": "B_Gen5_1",
+                "tier": "Basic",
+                "capacity": 1,
+                "size": 5120,
+                "family": "Gen5"
+            },
+            "resources": [
+                {
+                    "name": "AllowAll",
+                    "type": "firewallrules",
+                    "apiVersion": "2017-12-01",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "255.255.255.255"
+                    },
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'), '/databases/' , variables('dbName'))]",
+                        "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'))]"
+                    ]
+                },
+                {
+                    "name": "[variables('dbName')]",
+                    "type": "databases",
+                    "apiVersion": "2017-12-01",
+                    "properties": {
+                        "charset": "utf8",
+                        "collation": "utf8_general_ci"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'))]"
+                    ]
+                }
+            ]
+        }
+    ]
+}
