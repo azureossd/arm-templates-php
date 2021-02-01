@@ -43,7 +43,7 @@
                         },
                         {
                             "name": "DATABASE_HOST",
-                            "value": "[concat(variables('dbServerName'), 'mysql.database.azure.com')]"
+                            "value": "[concat(variables('dbServerName'), '.mysql.database.azure.com')]"
                         },
                         {
                             "name": "DATABASE_NAME",
