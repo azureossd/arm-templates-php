@@ -10,7 +10,7 @@
         "siteName": "[concat(toLower(variables('hostingPlanName')), uniqueString(resourceGroup().id))]",
         "sku":"S1",
         "dockerUrl":"https://index.docker.io",
-        "dockerImage":"azureossd/wordpress:v1",
+        "dockerImage":"azureossd/wordpress:v1.1",
         "gitRepo":"https://github.com/azureappserviceoss/wordpress-azure",
         "gitBranch":"linux-appservice"
     },
