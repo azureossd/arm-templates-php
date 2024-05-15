@@ -2,17 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "variables": {
-        "hostingPlanName":"[replace(resourceGroup().name,'.','')]",
-        "dbServerName":"[concat('mysqlsrv',  uniqueString(resourceGroup().id))]",
-        "dbName":"[concat('mysqldb',  uniqueString(resourceGroup().id))]",
-        "dbUser":"mysqldbuser",
+        "hostingPlanName": "[replace(resourceGroup().name,'.','')]",
+        "dbServerName": "[concat('mysqlsrv',  uniqueString(resourceGroup().id))]",
+        "dbName": "[concat('mysqldb',  uniqueString(resourceGroup().id))]",
+        "dbUser": "mysqldbuser",
         "dbUserPass": "Micr0s0ft",
         "siteName": "[concat(toLower(variables('hostingPlanName')), uniqueString(resourceGroup().id))]",
-        "sku":"S1",
-        "dockerUrl":"https://index.docker.io",
-        "dockerImage":"azureossd/wordpress:v1.3",
-        "gitRepo":"https://github.com/azureappserviceoss/wordpress-azure",
-        "gitBranch":"linux-appservice"
+        "sku": "S1",
+        "dockerUrl": "https://index.docker.io",
+        "dockerImage": "azureossd/wordpress:v1.3",
+        "gitRepo": "https://github.com/azureappserviceoss/wordpress-azure",
+        "gitBranch": "linux-appservice"
     },
     "resources": [
         {
@@ -21,13 +21,13 @@
             "type": "Microsoft.Web/serverfarms",
             "location": "[resourceGroup().location]",
             "sku": {
-              "name": "[variables('sku')]"
+                "name": "[variables('sku')]"
             },
             "kind": "linux",
             "properties": {
-              "reserved": true
+                "reserved": true
             }
-          },
+        },
         {
             "apiVersion": "2020-06-01",
             "location": "[resourceGroup().location]",
@@ -55,7 +55,7 @@
                         },
                         {
                             "name": "DATABASE_USERNAME",
-                            "value": "[concat(variables('dbUser'),'@',variables('dbServerName'))]"
+                            "value": "[concat(variables('dbUser'))]"
                         },
                         {
                             "name": "DOCKER_REGISTRY_SERVER_URL",
@@ -81,62 +81,80 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-                "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'), '/databases/' , variables('dbName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             ]
         },
         {
             "name": "[variables('dbServerName')]",
-            "type": "Microsoft.DBforMySQL/servers",
-            "apiVersion": "2017-12-01",
+            "type": "Microsoft.DBforMySQL/flexibleServers",
+            "apiVersion": "2021-05-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "version": "5.7",
+                "version": "8.0.21",
                 "createMode": "Default",
                 "administratorLogin": "[variables('dbUser')]",
                 "administratorLoginPassword": "[variables('dbUserPass')]",
                 "sslEnforcement": "Disabled",
-                "storageProfile": {
-                    "storageMB": 5120,
+                "storage": {
+                    "storageSizeGB": 20,
+                    "iops": 360,
+                    "autoGrow": "Enabled",
+                    "storageSku": "Premium_LRS"
+                },
+                "backup": {
                     "backupRetentionDays": 7,
-                    "geoRedundantBackup": "Disabled"
+                    "geoRedundantBackup": "Disabled",
+                    "earliestRestoreDate": "2024-05-13T14:46:05.9748431+00:00"
                 }
             },
             "sku": {
-                "name": "B_Gen5_1",
-                "tier": "Basic",
-                "capacity": 1,
-                "size": 5120,
-                "family": "Gen5"
+                "name": "Standard_B1ms",
+                "tier": "Burstable"
             },
             "resources": [
                 {
-                    "name": "AllowAll",
-                    "type": "firewallrules",
-                    "apiVersion": "2017-12-01",
-                    "properties": {
-                        "startIpAddress": "0.0.0.0",
-                        "endIpAddress": "255.255.255.255"
-                    },
-                    "location": "[resourceGroup().location]",
-                    "dependsOn": [
-                        "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'), '/databases/' , variables('dbName'))]",
-                        "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'))]"
+                    "name": "ALLALLOW",
+                    "type": "firewallRules",
+                    "apiVersion": "2020-07-01-preview",
+                     "properties": {
+                         "startIpAddress": "0.0.0.0",
+                         "endIpAddress": "255.255.255.255"
+                     },
+                     "location": "[resourceGroup().location]",
+					 "dependsOn": [
+                        "[concat('Microsoft.DBforMySQL/flexibleServers/', variables('dbServerName'))]"
                     ]
+					 
                 },
+				{
+					"type": "configurations",
+					"apiVersion": "2023-06-30",
+					"name": "require_secure_transport",
+					"properties": {
+						"currentValue": "OFF",
+						"source": "user-override",
+						"value": "OFF"
+					},
+					"dependsOn": [
+                        
+                        "[concat('Microsoft.DBforMySQL/flexibleServers/', variables('dbServerName'))]"
+                    ]
+				},
+
                 {
                     "name": "[variables('dbName')]",
                     "type": "databases",
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2023-06-30",
                     "properties": {
                         "charset": "utf8",
                         "collation": "utf8_general_ci"
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.DBforMySQL/servers/', variables('dbServerName'))]"
+                        "[concat('Microsoft.DBforMySQL/flexibleServers/', variables('dbServerName'))]"
                     ]
                 }
             ]
         }
+       
     ]
 }
