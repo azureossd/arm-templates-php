@@ -6,7 +6,7 @@
         "siteName": "[concat(toLower(variables('hostingPlanName')), uniqueString(resourceGroup().id))]",
         "sku":"S1",
         "repoURL":"https://github.com/azureossd/php-windows-2.git",
-        "branch":"updating-to-8",
+        "branch":"master",
         "siteConfig": {
           "phpVersion": "8.3",
           "appCommandLine": "/home/site/wwwroot/startup.sh"
