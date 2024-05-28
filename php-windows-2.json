@@ -6,9 +6,10 @@
         "siteName": "[concat(toLower(variables('hostingPlanName')), uniqueString(resourceGroup().id))]",
         "sku":"S1",
         "repoURL":"https://github.com/azureossd/php-windows-2.git",
-        "branch":"master",
+        "branch":"updating-to-8",
         "siteConfig": {
-          "phpVersion": "7.3"
+          "phpVersion": "8.3",
+          "appCommandLine": "/home/site/wwwroot/startup.sh"
         }
     },
     "resources": [
@@ -31,7 +32,7 @@
         ],
         "properties": {
           "siteConfig": "[variables('siteConfig')]",
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"            
         },
         "resources": [
           {
