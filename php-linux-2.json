@@ -8,7 +8,8 @@
         "repoURL":"https://github.com/azureossd/php-xdebug-example.git",
         "branch":"master",
         "siteConfig": {
-          "linuxFxVersion": "PHP|8.3"
+          "linuxFxVersion": "PHP|8.3",
+          "appCommandLine": "/home/site/wwwroot/startup.sh"
         }
     },
     "resources": [
